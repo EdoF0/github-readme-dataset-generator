@@ -1,13 +1,33 @@
 import csv
+from os.path import isfile
 
 DATASET_NAME = "dataset.csv"
 DATASET_NAME_TEST = "dataset-test.csv"
 
-def create_dataset(name = DATASET_NAME):
+# fast count lines solution - https://stackoverflow.com/questions/9629179/python-counting-lines-in-a-huge-10gb-file-as-fast-as-possible
+
+def blocks(file:str, size=65536):
+    while True:
+        b = file.read(size)
+        if not b: break
+        yield b
+
+def count_lines(file:str) -> int:
+    with open(file, "r", encoding="utf-8") as f:
+        return sum(bl.count("\n") for bl in blocks(f))
+
+def create_dataset(name = DATASET_NAME, append = False):
     # newline='' required, see https://docs.python.org/3/library/csv.html#id3
-    dataset = open(name, 'w', newline='', encoding="utf-8")
+    mode = 'w'
+    if append:
+        mode = 'a'
+    exists = isfile(name)
+    # note: both modes `w` and `a` create a new file if it does not exists
+    dataset = open(name, mode, newline='', encoding="utf-8")
     writer = csv.writer(dataset, escapechar='\\')
-    writer.writerow(["owner", "repo", "release", "language", "stars", "readme"])
+    if (not append) or (not exists):
+        # write csv header
+        writer.writerow(["owner", "repo", "release", "language", "stars", "readme"])
     return create_writer_function(writer), create_close_function(dataset)
 
 def create_close_function(dataset):
@@ -17,12 +37,12 @@ def create_close_function(dataset):
 
 def create_writer_function(writer: csv.writer):
     def dataset_write(owner: str, repo: str, release: bool, language: str, stars:int, readme: str):
-        writer.writerow([owner, repo, str(release), str(stars), language, readme])
+        writer.writerow([owner, repo, str(release), str(stars), language, readme.replace("\n", "\\n")])
     return dataset_write
 
 if __name__ == "__main__":
     print("Dataset write test")
-    write, close = create_dataset(DATASET_NAME_TEST)
+    write, close = create_dataset(DATASET_NAME_TEST, append=True)
     write(
         "rust-lang",
         "rust",
@@ -534,3 +554,5 @@ This could mean:
         reader = csv.reader(dataset, escapechar='\\')
         for row in reader:
             print(row)
+
+    print("lines: " + str(count_lines(DATASET_NAME_TEST)))
