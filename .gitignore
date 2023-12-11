@@ -1,3 +1,6 @@
 # output dataset
 dataset.csv
 dataset-test.csv
+
+# python
+__pycache__/
