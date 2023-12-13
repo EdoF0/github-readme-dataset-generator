@@ -29,7 +29,8 @@ if __name__ == "__main__":
     print("writing to " + dataset)
     print("target csv rows: " + str(rows))
 
-    i = 0
+    i = 0  # counts writes to dataset
+    i0 = 0 # counts requests and not writes
     if (append):
         written_rows = count_lines(dataset)
         written_rows -= 1 # do not count header
@@ -43,6 +44,7 @@ if __name__ == "__main__":
         owner, repo = randomRepo()
         language, percent = repoLanguage(owner, repo)
         stars = repoStars(owner, repo)
+        i0 += 1
         if (percent > 0.80 and stars > 200):
             write(
                 owner=owner,
@@ -53,8 +55,8 @@ if __name__ == "__main__":
                 readme=repoReadme(owner, repo)
             )
             i += 1
-            print(f"line {i} of {rows} -- written {owner}/{repo} ({stars} stars, lang {language} {percent*100}%)                                              ", end=print_end)
+            print(f"request {i0} - line {i} of {rows} -- written {owner}/{repo} ({stars} stars, lang {language} {percent*100}%)               ", end=print_end)
         else:
-            print(f"line {i} of {rows} -- skipped {owner}/{repo} ({stars} stars, lang {language} {percent*100}%)                                              ", end=print_end)
-    print(f"finished writing {rows} rows                                                                                                              ")
+            print(f"request {i0} - line {i} of {rows} -- skipped {owner}/{repo} ({stars} stars, lang {language} {percent*100}%)               ", end=print_end)
+    print(f"finished writing {rows} rows                                                                               ")
     close()
