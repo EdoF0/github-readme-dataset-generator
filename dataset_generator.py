@@ -1,3 +1,4 @@
+from os.path import isfile
 from random_repo import randomRepo
 from repo_data import repoHasRelease, repoLanguage, repoReadme, repoStars
 from write_dataset import create_dataset, count_lines, DATASET_NAME, DATASET_NAME_TEST
@@ -31,13 +32,20 @@ if __name__ == "__main__":
 
     i = 0  # counts writes to dataset
     i0 = 0 # counts requests and not writes
-    if (append):
-        written_rows = count_lines(dataset)
-        written_rows -= 1 # do not count header
-        i = written_rows
-        print("append mode on, " + str(written_rows) + " already in file (header excluded)")
+    exists = isfile(dataset)
+    if append:
+        if exists:
+            written_rows = count_lines(dataset)
+            written_rows -= 1 # do not count header
+            i = written_rows
+            print("append mode on, " + str(written_rows) + " already in file (header excluded)")
+        else:
+            print("append mode on, creating new dataset " + dataset)
     else:
-        print("overwriting dataset if present")
+        if exists:
+            print("warning! overwriting dataset " + dataset)
+        else:
+            print("creating new dataset, file: " + dataset)
 
     write, close = create_dataset(dataset, append=append)
     while i < rows:
