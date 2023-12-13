@@ -2,5 +2,8 @@
 dataset.csv
 dataset-test.csv
 
+# token
+token.txt
+
 # python
 __pycache__/
