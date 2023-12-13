@@ -10,5 +10,5 @@ def randomRepo() -> tuple[str, str]:
 
 if __name__ == "__main__":
     print("Random repo test")
-    for _ in range(6):
-        print(randomRepo())
+    for i in range(6):
+        print(str(i+1) + " ", randomRepo())
