@@ -27,7 +27,7 @@ def create_dataset(name = DATASET_NAME, append = False):
     writer = csv.writer(dataset, escapechar='\\')
     if (not append) or (not exists):
         # write csv header
-        writer.writerow(["owner", "repo", "release", "language", "stars", "readme"])
+        writer.writerow(["owner", "repo", "release", "stars", "language", "readme"])
     return create_writer_function(writer), create_close_function(dataset)
 
 def create_close_function(dataset):
@@ -49,6 +49,7 @@ if __name__ == "__main__":
         True,
         "Rust",
         87849,
+        # collapse this line
         """# The Rust Programming Language
 
 [![Rust Community](https://img.shields.io/badge/Rust_Community%20-Join_us-brightgreen?style=plastic&logo=rust)](https://www.rust-lang.org/community)
@@ -371,6 +372,7 @@ Third-party logos may be subject to third-party copyrights and trademarks. See
         False,
         "TypeScript",
         2422,
+        # collapse this line
         """# FastUI
 
 [![CI](https://github.com/pydantic/FastUI/actions/workflows/ci.yml/badge.svg)](https://github.com/pydantic/FastUI/actions?query=event%3Apush+branch%3Amain+workflow%3ACI)
