@@ -37,6 +37,16 @@ def create_close_function(dataset):
 
 def create_writer_function(writer: csv.writer):
     def dataset_write(owner: str, repo: str, release: bool, language: str, stars:int, readme: str):
+        readme = readme.replace(
+            # Windows newlines convention
+            "\r\n", "\\r\\n"
+        ).replace(
+            # Macintosh newlines old convention
+            "\r", "\\r"
+        ).replace(
+            # Unix newlines convention
+            "\n", "\\n"
+        )
         writer.writerow([owner, repo, str(release), str(stars), language, readme.replace("\n", "\\n")])
     return dataset_write
 
