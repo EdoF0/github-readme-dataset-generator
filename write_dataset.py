@@ -28,14 +28,14 @@ def create_dataset(name = DATASET_NAME, append = False):
     if (not append) or (not exists):
         # write csv header
         writer.writerow(["owner", "repo", "release", "stars", "language", "readme"])
-    return create_writer_function(writer), create_close_function(dataset)
+    return create_writer_function(dataset, writer), create_close_function(dataset)
 
-def create_close_function(dataset):
+def create_close_function(file):
     def close_dataset():
-        dataset.close()
+        file.close()
     return close_dataset
 
-def create_writer_function(writer: csv.writer):
+def create_writer_function(file, csv_writer):
     def dataset_write(owner: str, repo: str, release: bool, language: str, stars:int, readme: str):
         readme = readme.replace(
             # Windows newlines convention
@@ -47,7 +47,8 @@ def create_writer_function(writer: csv.writer):
             # Unix newlines convention
             "\n", "\\n"
         )
-        writer.writerow([owner, repo, str(release), str(stars), language, readme.replace("\n", "\\n")])
+        csv_writer.writerow([owner, repo, str(release), str(stars), language, readme.replace("\n", "\\n")])
+        file.flush()
     return dataset_write
 
 if __name__ == "__main__":
