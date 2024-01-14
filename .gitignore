@@ -7,3 +7,4 @@ token.txt
 
 # python
 __pycache__/
+.venv
