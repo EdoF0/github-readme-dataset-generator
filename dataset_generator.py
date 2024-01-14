@@ -1,5 +1,5 @@
 from os.path import isfile
-from random_repo import randomRepo
+from get_repo_random import randomRepo
 from repo_data import repoHasRelease, repoLanguage, repoReadme, repoStars
 from write_dataset import create_dataset, count_lines, DATASET_NAME, DATASET_NAME_TEST
 
