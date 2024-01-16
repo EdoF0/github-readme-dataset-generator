@@ -19,18 +19,23 @@ def githubApiGet(url:str, useToken = USE_TOKEN) -> any:
         headers["Authorization"] = "Bearer " + githubApiGet.token
 
     reqUrl = "https://api.github.com" + url
-    response = requests.get(reqUrl, headers = headers)
-    # check if authentication is successful
-    # check for header 'X-RateLimit-Limit': '5000' (5000 for standard GitHub users)
-    # can also look at 'X-RateLimit-Remaining' and 'X-RateLimit-Used' to check the usage
-    # the rate limit is per-hour (see https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28)
-    # side note: anonymous rate limit is 60 requests per hour
-    #print(response.headers)
-    if response.status_code == 403 or response.status_code == 429:
-        # see https://docs.github.com/en/rest/overview/rate-limits-for-the-rest-api?apiVersion=2022-11-28
-        raise Exception("Rate limit exceeded")
+    # timeout for connect and read, respecting best practices (https://requests.readthedocs.io/en/stable/user/advanced/#timeouts)
+    response = requests.get(reqUrl, headers = headers, timeout=(6.05, 9))
     if not response.ok:
-        raise Exception(f"Response status code {str(response.status_code)} for GET {reqUrl}")
+        # check if authentication is successful
+        # check for header 'X-RateLimit-Limit': '5000' (5000 for standard GitHub users)
+        # can also look at 'X-RateLimit-Remaining' and 'X-RateLimit-Used' to check the usage
+        # the rate limit is per-hour (see https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28)
+        # side note: anonymous rate limit is 60 requests per hour
+        #print(response.headers)
+        if response.status_code == 403 or response.status_code == 429:
+            # see https://docs.github.com/en/rest/overview/rate-limits-for-the-rest-api?apiVersion=2022-11-28
+            raise Exception("Rate limit exceeded while requesting " + reqUrl)
+        elif response.status_code == 404 or response.status_code == 451:
+            # if deleted or blocked due to legal reasons
+            raise LookupError(reqUrl)
+        else:
+            raise Exception(f"Response status code {str(response.status_code)} for GET {reqUrl}")
     return json.loads(response.content)
 # variable persistent across function calls, to avoid reading the token file for every request
 # see https://stackoverflow.com/questions/279561/what-is-the-python-equivalent-of-static-variables-inside-a-function
